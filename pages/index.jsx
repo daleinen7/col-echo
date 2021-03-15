@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { connectToDatabase } from '../util/mongodb'
 
-export default function Home({ isConnected }) {
+export default function Home({ posts }) {
   return (
     <div className="container">
       <Head>
@@ -14,8 +14,16 @@ export default function Home({ isConnected }) {
           Col-Echo
         </h1>
         <p>Mongo db is connected</p>
+        <ul>
+          {posts.map((post) => (
+            <li>
+              <h2>{post.title}</h2>
+              <p>{post.description}</p>
+              <p>{post.category}</p>
+            </li>
+          ))}
+        </ul>
       </main>
-
       <style jsx>{`
         .container {
           min-height: 100vh;
@@ -150,7 +158,6 @@ export default function Home({ isConnected }) {
           }
         }
       `}</style>
-
       <style jsx global>{`
         html,
         body {
@@ -169,12 +176,15 @@ export default function Home({ isConnected }) {
   )
 }
 
-export async function getServerSideProps(context) {
-  const { client } = await connectToDatabase()
-
-  const isConnected = await client.isConnected()
-
+export async function getServerSideProps() {
+  const { db } = await connectToDatabase();
+  const posts = await db
+    .collection("posts")
+    .find({})
+    .toArray();
   return {
-    props: { isConnected },
-  }
+    props: {
+      posts: JSON.parse(JSON.stringify(posts)),
+    },
+  };
 }
