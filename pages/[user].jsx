@@ -6,7 +6,7 @@ export default function Home( props ) {
   return (
     <div className="container">
       <Head>
-        <title>Col-Echo</title>
+        <title>Col-Echo | </title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -14,8 +14,7 @@ export default function Home( props ) {
         <h1 className="title">
           Col-Echo
         </h1>
-				<p>Hi {props.user}</p>
-        <p>Mongo db is connected</p>
+				<p>Hi {props.user.name}</p>
         <ul>
           {props.posts.map((post) => (
             <li>
@@ -181,17 +180,19 @@ export default function Home( props ) {
 
 export async function getServerSideProps(context) {
   const { db } = await connectToDatabase();
+	const user = await db
+		.collection("users")
+		.find({name: context.query.user})
+		.toArray();
+	console.log(user[0]._id);
   const posts = await db
     .collection("posts")
-    // .find({})
-		// .find( { title: "I'm a happy Confrence Call" } )
-    .find({user: ObjectID("5fa98f6e75b098023aa92b0f")})
+    .find({user: ObjectID(user[0]._id)})
     .toArray();
-		console.log(posts);
   return {
     props: {
       posts: JSON.parse(JSON.stringify(posts)),
-			user: context.query.user
+			user: JSON.parse(JSON.stringify(user[0])),
     },
   };
 }
