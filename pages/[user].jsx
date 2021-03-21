@@ -1,8 +1,8 @@
+import { ObjectID } from 'bson';
 import Head from 'next/head'
 import { connectToDatabase } from '../util/mongodb'
 
-export default function Home({ posts }) {
-
+export default function Home( props ) {
   return (
     <div className="container">
       <Head>
@@ -14,13 +14,15 @@ export default function Home({ posts }) {
         <h1 className="title">
           Col-Echo
         </h1>
+				<p>Hi {props.user}</p>
         <p>Mongo db is connected</p>
         <ul>
-          {posts.map((post) => (
+          {props.posts.map((post) => (
             <li>
               <h2>{post.title}</h2>
               <p>{post.description}</p>
               <p>{post.category}</p>
+							<p>{post.user}</p>
             </li>
           ))}
         </ul>
@@ -177,15 +179,19 @@ export default function Home({ posts }) {
   )
 }
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context) {
   const { db } = await connectToDatabase();
   const posts = await db
     .collection("posts")
-    .find({})
+    // .find({})
+		// .find( { title: "I'm a happy Confrence Call" } )
+    .find({user: ObjectID("5fa98f6e75b098023aa92b0f")})
     .toArray();
+		console.log(posts);
   return {
     props: {
       posts: JSON.parse(JSON.stringify(posts)),
+			user: context.query.user
     },
   };
 }
