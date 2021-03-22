@@ -19,8 +19,10 @@ export default function Home({ posts }) {
           {posts.map((post) => (
             <li>
               <h2>{post.title}</h2>
+              <h3></h3>
               <p>{post.description}</p>
               <p>{post.category}</p>
+              <p>Go to <a href={"echo/" + post.slug}>Post</a></p>
             </li>
           ))}
         </ul>
@@ -177,8 +179,13 @@ export default function Home({ posts }) {
   )
 }
 
-export async function getServerSideProps() {
+// Find user by name from query, then find all posts by that user's name
+export async function getServerSideProps(context) {
   const { db } = await connectToDatabase();
+	const users = await db
+		.collection("users")
+		.find({})
+		.toArray();
   const posts = await db
     .collection("posts")
     .find({})
@@ -186,6 +193,7 @@ export async function getServerSideProps() {
   return {
     props: {
       posts: JSON.parse(JSON.stringify(posts)),
+			users: JSON.parse(JSON.stringify(users)),
     },
   };
 }

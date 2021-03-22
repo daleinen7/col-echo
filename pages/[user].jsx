@@ -22,6 +22,8 @@ export default function Home( props ) {
               <p>{post.description}</p>
               <p>{post.category}</p>
 							<p>{post.user}</p>
+              <p>Go to <a href={"echo/" + post.slug}>Post</a></p>
+
             </li>
           ))}
         </ul>
@@ -185,7 +187,6 @@ export async function getServerSideProps(context) {
 		.collection("users")
 		.find({name: context.query.user})
 		.toArray();
-	console.log(user[0]._id);
   const posts = await db
     .collection("posts")
     .find({user: ObjectID(user[0]._id)})
