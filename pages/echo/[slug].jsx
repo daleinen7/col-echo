@@ -1,12 +1,15 @@
-import { ObjectID } from 'bson';
 import Head from 'next/head'
-import { connectToDatabase } from '../util/mongodb'
+import { connectToDatabase } from '../../util/mongodb'
+
+const slugify = require('slugify')
+
 
 export default function Home( props ) {
+  // console.log(slugify("I'm a happy Confrence Call",{remove: /[*+~.()'"`!:@]/g, lower: true}));
   return (
     <div className="container">
       <Head>
-        <title>Col-Echo | </title>
+        <title>Col-Echo | "{props.echo.title}" by {props.user.name} </title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -15,16 +18,9 @@ export default function Home( props ) {
           Col-Echo
         </h1>
 				<p>Hi {props.user.name}</p>
-        <ul>
-          {props.posts.map((post) => (
-            <li>
-              <h2>{post.title}</h2>
-              <p>{post.description}</p>
-              <p>{post.category}</p>
-							<p>{post.user}</p>
-            </li>
-          ))}
-        </ul>
+        <h2>{props.echo.title}</h2>
+        <p>{props.echo.description}</p>
+        <p>{props.echo.category}</p>
       </main>
       <style jsx>{`
         .container {
@@ -181,19 +177,21 @@ export default function Home( props ) {
 // Find user by name from query, then find all posts by that user's name
 export async function getServerSideProps(context) {
   const { db } = await connectToDatabase();
-	const user = await db
-		.collection("users")
-		.find({name: context.query.user})
-		.toArray();
-	console.log(user[0]._id);
   const posts = await db
     .collection("posts")
-    .find({user: ObjectID(user[0]._id)})
+    .find({
+      slug: context.query.slug
+    })
     .toArray();
+  const user = await db
+    .collection("users")
+    .find({_id : posts[0].user})
+    .toArray();
+  console.log(user);
   return {
     props: {
-      posts: JSON.parse(JSON.stringify(posts)),
-			user: JSON.parse(JSON.stringify(user[0])),
+      echo: JSON.parse(JSON.stringify(posts))[0],
+      user: JSON.parse(JSON.stringify(user))[0],
     },
   };
 }
