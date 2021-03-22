@@ -1,12 +1,12 @@
+import { ObjectID } from 'bson';
 import Head from 'next/head'
 import { connectToDatabase } from '../util/mongodb'
 
-export default function Home({ posts }) {
-
+export default function Home( props ) {
   return (
     <div className="container">
       <Head>
-        <title>Col-Echo</title>
+        <title>Col-Echo | </title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -14,15 +14,16 @@ export default function Home({ posts }) {
         <h1 className="title">
           Col-Echo
         </h1>
-        <p>Mongo db is connected</p>
+				<p>Hi {props.user.name}</p>
         <ul>
-          {posts.map((post) => (
+          {props.posts.map((post) => (
             <li>
               <h2>{post.title}</h2>
-              <h3></h3>
               <p>{post.description}</p>
               <p>{post.category}</p>
+							<p>{post.user}</p>
               <p>Go to <a href={"echo/" + post.slug}>Post</a></p>
+
             </li>
           ))}
         </ul>
@@ -182,18 +183,18 @@ export default function Home({ posts }) {
 // Find user by name from query, then find all posts by that user's name
 export async function getServerSideProps(context) {
   const { db } = await connectToDatabase();
-	const users = await db
+	const user = await db
 		.collection("users")
-		.find({})
+		.find({name: context.query.user})
 		.toArray();
   const posts = await db
     .collection("posts")
-    .find({})
+    .find({user: ObjectID(user[0]._id)})
     .toArray();
   return {
     props: {
       posts: JSON.parse(JSON.stringify(posts)),
-			users: JSON.parse(JSON.stringify(users)),
+			user: JSON.parse(JSON.stringify(user[0])),
     },
   };
 }

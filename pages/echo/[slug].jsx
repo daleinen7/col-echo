@@ -1,12 +1,15 @@
 import Head from 'next/head'
-import { connectToDatabase } from '../util/mongodb'
+import { connectToDatabase } from '../../util/mongodb'
 
-export default function Home({ posts }) {
+const slugify = require('slugify')
 
+
+export default function Home( props ) {
+  // console.log(slugify("I'm a happy Confrence Call",{remove: /[*+~.()'"`!:@]/g, lower: true}));
   return (
     <div className="container">
       <Head>
-        <title>Col-Echo</title>
+        <title>Col-Echo | "{props.echo.title}" by {props.user.name} </title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -14,18 +17,10 @@ export default function Home({ posts }) {
         <h1 className="title">
           Col-Echo
         </h1>
-        <p>Mongo db is connected</p>
-        <ul>
-          {posts.map((post) => (
-            <li>
-              <h2>{post.title}</h2>
-              <h3></h3>
-              <p>{post.description}</p>
-              <p>{post.category}</p>
-              <p>Go to <a href={"echo/" + post.slug}>Post</a></p>
-            </li>
-          ))}
-        </ul>
+				<p>Hi {props.user.name}</p>
+        <h2>{props.echo.title}</h2>
+        <p>{props.echo.description}</p>
+        <p>{props.echo.category}</p>
       </main>
       <style jsx>{`
         .container {
@@ -182,18 +177,21 @@ export default function Home({ posts }) {
 // Find user by name from query, then find all posts by that user's name
 export async function getServerSideProps(context) {
   const { db } = await connectToDatabase();
-	const users = await db
-		.collection("users")
-		.find({})
-		.toArray();
   const posts = await db
     .collection("posts")
-    .find({})
+    .find({
+      slug: context.query.slug
+    })
     .toArray();
+  const user = await db
+    .collection("users")
+    .find({_id : posts[0].user})
+    .toArray();
+  console.log(user);
   return {
     props: {
-      posts: JSON.parse(JSON.stringify(posts)),
-			users: JSON.parse(JSON.stringify(users)),
+      echo: JSON.parse(JSON.stringify(posts))[0],
+      user: JSON.parse(JSON.stringify(user))[0],
     },
   };
 }
