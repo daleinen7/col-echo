@@ -1,15 +1,13 @@
 import Head from 'next/head'
 import { connectToDatabase } from '../util/mongodb'
+import Header from "../components/Header"
 
 export default function Home({ posts }) {
 
   return (
+    
     <div className="container">
-      <Head>
-        <title>Col-Echo</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
+    <Header title="Home"/>
       <main>
         <h1 className="title">
           Col-Echo

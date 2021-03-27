@@ -5,10 +5,7 @@ import { connectToDatabase } from '../util/mongodb'
 export default function Home( props ) {
   return (
     <div className="container">
-      <Head>
-        <title>Col-Echo | </title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <Header title="User"/>
 
       <main>
         <h1 className="title">

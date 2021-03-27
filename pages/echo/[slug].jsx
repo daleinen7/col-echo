@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import { connectToDatabase } from '../../util/mongodb'
+import Header from "../../components/Header"
 
 const slugify = require('slugify')
 
@@ -8,10 +9,7 @@ export default function Home( props ) {
   // console.log(slugify("I'm a happy Confrence Call",{remove: /[*+~.()'"`!:@]/g, lower: true}));
   return (
     <div className="container">
-      <Head>
-        <title>Col-Echo | "{props.echo.title}" by {props.user.name} </title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <Header title="SLUG!!!!!"/>
 
       <main>
         <h1 className="title">
