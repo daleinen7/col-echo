@@ -1,7 +1,10 @@
 import Head from 'next/head'
-import { connectToDatabase } from '../util/mongodb'
+// import { connectToDatabase } from '../util/mongodb'
+import dbConnect from '../util/dbConnect'
+import User from '../models/User';
+import Echo from '../models/Echo';
 
-export default function Home({ posts }) {
+export default function Home({ users }) {
 
   return (
     <div className="container">
@@ -15,7 +18,10 @@ export default function Home({ posts }) {
           Col-Echo
         </h1>
         <p>Mongo db is connected</p>
-        <ul>
+        {users.map((user)=> (
+          <p>{user.name}</p>
+        ))}
+        {/* <ul>
           {posts.map((post) => (
             <li>
               <h2>{post.title}</h2>
@@ -25,7 +31,7 @@ export default function Home({ posts }) {
               <p>Go to <a href={"echo/" + post.slug}>Post</a></p>
             </li>
           ))}
-        </ul>
+        </ul> */}
       </main>
       <style jsx>{`
         .container {
@@ -181,15 +187,11 @@ export default function Home({ posts }) {
 
 // Find user by name from query, then find all posts by that user's name
 export async function getServerSideProps(context) {
-  const { db } = await connectToDatabase();
-	const users = await db
-		.collection("users")
+  await dbConnect()
+	const users = await User
 		.find({})
-		.toArray();
-  const posts = await db
-    .collection("posts")
+  const posts = await Echo
     .find({})
-    .toArray();
   return {
     props: {
       posts: JSON.parse(JSON.stringify(posts)),
