@@ -10,7 +10,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: [true, 'Please provide an e-mail']
     }
-
+    
 })
 
 export default mongoose.models.User || mongoose.model('User', UserSchema)

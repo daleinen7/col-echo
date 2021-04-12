@@ -4,7 +4,7 @@ import { connectToDatabase } from '../../util/mongodb'
 const slugify = require('slugify')
 
 
-export default function Home( props ) {
+export default function slug( props ) {
   // console.log(slugify("I'm a happy Confrence Call",{remove: /[*+~.()'"`!:@]/g, lower: true}));
   return (
     <div className="container">
